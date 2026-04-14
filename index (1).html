@@ -457,9 +457,27 @@ a { color: inherit; }
 /* ═══════════════════════════════════════
    HERO
 ═══════════════════════════════════════ */
+
+/*
+  ════════════════════════════════════════
+  IMAGEN DE FONDO DEL HERO — EDITAR AQUÍ
+  ════════════════════════════════════════
+  Para cambiar la imagen de fondo del hero:
+  1. Sube tu foto a la misma carpeta que este archivo
+  2. Reemplaza "url('TU-IMAGEN.jpg')" abajo
+  3. Ajusta --hero-overlay-opacity (0.0 = sin oscurecimiento, 0.85 = muy oscuro)
+
+  Ejemplo:
+    --hero-bg-image: url('salon-interior.jpg');
+    --hero-overlay-opacity: 0.55;
+*/
+:root {
+  --hero-bg-image: none; /* ← PEGA AQUÍ tu imagen: url('mi-foto.jpg') */
+  --hero-overlay-opacity: 0.60;
+}
+
 .hero {
   min-height: 100svh;
-  background: linear-gradient(155deg, #ffffff 0%, var(--pearl) 45%, var(--pearl2) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -468,10 +486,67 @@ a { color: inherit; }
   padding: 8rem 2rem 5rem;
   position: relative;
   overflow: hidden;
+  /* Fondo dinámico: imagen si está configurada, gradiente como fallback */
+  background-image: var(--hero-bg-image, none);
+  background-color: var(--pearl);
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
 }
 
-/* Ambient orbs */
-.hero::before {
+/* Overlay oscuro sobre la imagen (solo activo cuando hay imagen de fondo) */
+.hero-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 14, 6, var(--hero-overlay-opacity));
+  pointer-events: none;
+  z-index: 0;
+  /* Se muestra solo si el hero tiene imagen de fondo — controlado por JS */
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.hero.has-bg-image .hero-bg-overlay { opacity: 1; }
+.hero.has-bg-image { background-color: var(--dark); }
+
+/* Modo sin imagen: gradiente original */
+.hero:not(.has-bg-image) {
+  background: linear-gradient(155deg, #ffffff 0%, var(--pearl) 45%, var(--pearl2) 100%);
+}
+
+/* Modo con imagen: texto en blanco para legibilidad */
+.hero.has-bg-image .hero-eyebrow .eyebrow-text,
+.hero.has-bg-image .hero-subtitle,
+.hero.has-bg-image .hero-location-pill {
+  color: rgba(255,255,255,0.82);
+}
+.hero.has-bg-image .hero-location-pill {
+  background: rgba(0,0,0,0.35);
+  border-color: rgba(191,160,106,0.4);
+}
+.hero.has-bg-image .hero h1 {
+  color: rgba(255,255,255,0.95);
+}
+.hero.has-bg-image .hero h1 span {
+  color: rgba(255,255,255,0.6) !important;
+}
+.hero.has-bg-image .proof-label { color: rgba(255,255,255,0.65); }
+.hero.has-bg-image .proof-number { color: var(--gold-light); }
+.hero.has-bg-image .proof-sep { background: rgba(191,160,106,0.4); }
+.hero.has-bg-image .scroll-hint span { color: rgba(255,255,255,0.5); }
+.hero.has-bg-image .btn-outline {
+  color: var(--gold-light);
+  border-color: rgba(191,160,106,0.6);
+}
+.hero.has-bg-image .btn-outline:hover {
+  background: var(--gold);
+  color: var(--white);
+}
+
+/* Todos los elementos del hero encima del overlay */
+.hero > * { position: relative; z-index: 1; }
+
+/* Ambient orbs (solo sin imagen) */
+.hero:not(.has-bg-image)::before {
   content: '';
   position: absolute;
   width: 700px; height: 700px;
@@ -479,8 +554,9 @@ a { color: inherit; }
   background: radial-gradient(ellipse, rgba(191,160,106,0.09) 0%, transparent 65%);
   top: -200px; right: -150px;
   pointer-events: none;
+  z-index: 0;
 }
-.hero::after {
+.hero:not(.has-bg-image)::after {
   content: '';
   position: absolute;
   width: 500px; height: 500px;
@@ -488,6 +564,7 @@ a { color: inherit; }
   background: radial-gradient(ellipse, rgba(191,160,106,0.07) 0%, transparent 65%);
   bottom: -100px; left: -100px;
   pointer-events: none;
+  z-index: 0;
 }
 
 .hero-eyebrow {
@@ -1314,41 +1391,572 @@ footer {
 .sticky-wa:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(37,211,102,0.45); }
 
 /* ═══════════════════════════════════════
-   SECTION PADDING UTILITY
+   BOOKING MODAL — SELECCIÓN DE ESTILISTA
 ═══════════════════════════════════════ */
-section { padding: 5rem 2rem; }
+
+/* Backdrop */
+.booking-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(20, 14, 6, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.booking-modal-backdrop.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Modal box */
+.booking-modal {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  max-width: 860px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 24px 80px rgba(20,14,6,0.45);
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.35s ease;
+}
+.booking-modal-backdrop.open .booking-modal {
+  transform: translateY(0) scale(1);
+}
+
+/* Modal header */
+.booking-modal-header {
+  padding: 2.2rem 2.5rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.booking-modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1.2;
+}
+.booking-modal-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+  letter-spacing: 0.05em;
+}
+.booking-modal-close {
+  background: none;
+  border: 1px solid var(--border);
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  margin-top: 2px;
+}
+.booking-modal-close:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--white);
+}
+
+/* Stylists grid inside modal */
+.booking-stylists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem 2.5rem 2.5rem;
+}
+
+/* Each stylist card in modal */
+.booking-stylist-card {
+  border: 1px solid var(--border);
+  background: var(--white);
+  padding: 1.8rem 1.5rem 1.5rem;
+  text-align: center;
+  transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.booking-stylist-card:hover {
+  box-shadow: 0 8px 32px rgba(139,107,46,0.13);
+  transform: translateY(-3px);
+  border-color: var(--gold-light);
+}
+.booking-stylist-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+.booking-stylist-card:hover::after { transform: scaleX(1); }
+
+/* Stylist photo / avatar */
+.booking-stylist-photo {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  margin: 0 auto 1.1rem;
+  border: 2px solid var(--gold-light);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--gold-lighter), var(--pearl));
+}
+.booking-stylist-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.booking-stylist-photo .avatar-initials {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--gold-dark);
+}
+
+/* Stylist info */
+.booking-stylist-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+}
+.booking-stylist-specialty {
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.4rem;
+}
+
+/* Booking buttons inside each stylist card */
+.booking-stylist-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.booking-btn-setmore {
+  display: block;
+  text-align: center;
+  background: var(--gold);
+  color: var(--white);
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: background 0.2s, transform 0.2s;
+  border: none;
+  cursor: pointer;
+}
+.booking-btn-setmore:hover {
+  background: var(--gold-dark);
+  transform: translateY(-1px);
+}
+
+.booking-btn-wa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: transparent;
+  border: 1px solid rgba(37,211,102,0.5);
+  color: #1a9d4a;
+  padding: 0.6rem 1rem;
+  text-decoration: none;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  transition: all 0.2s;
+}
+.booking-btn-wa:hover {
+  background: #25D366;
+  border-color: #25D366;
+  color: var(--white);
+}
+
+/* Modal footer note */
+.booking-modal-footer {
+  padding: 0 2.5rem 2rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.7;
+}
+.booking-modal-footer a {
+  color: var(--gold-dark);
+  text-decoration: underline;
+}
+
+/* Also available in CTA section */
+.cta-reservar-btn {
+  background: var(--gold);
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+}
+.cta-reservar-btn:hover { background: var(--gold-dark); }
+
+@media (max-width: 600px) {
+  .booking-modal-header { padding: 1.5rem 1.5rem 1.2rem; }
+  .booking-stylists-grid { grid-template-columns: 1fr; padding: 1.5rem; gap: 1rem; }
+  .booking-modal-footer { padding: 0 1.5rem 1.5rem; }
+}
 
 /* ═══════════════════════════════════════
-   RESPONSIVE HELPERS
+   SOBRE NOSOTROS — GALERÍA VISUAL
+   (insertar antes de la sección equipo)
 ═══════════════════════════════════════ */
-@media (max-width: 640px) {
-  .hero h1 { font-size: 1.9rem; }
-  .hero-brand { font-size: 4.5rem; }
-  .cta-title { font-size: 1.6rem; }
+.about-section {
+  background: var(--white);
+  padding: 6rem 2rem;
+  overflow: hidden;
+}
+
+/* Layout alternado: texto izquierda + galería derecha en desktop */
+.about-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.about-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+  margin-bottom: 4rem;
+}
+
+.about-text-col {}
+
+.about-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1.15;
+  margin-bottom: 1.2rem;
+}
+.about-title em {
+  font-style: italic;
+  color: var(--gold-dark);
+}
+
+.about-body {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.9;
+  margin-bottom: 1.5rem;
+}
+
+.about-values {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+.about-value-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text);
+}
+.about-value-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+/* Featured image on right */
+.about-featured-img {
+  position: relative;
+}
+.about-featured-img .img-frame {
+  aspect-ratio: 4/5;
+  background: var(--pearl2);
+  overflow: hidden;
+  position: relative;
+}
+.about-featured-img .img-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+.about-featured-img .img-frame:hover img { transform: scale(1.04); }
+.about-featured-img .img-frame .img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.about-featured-img .img-frame .img-placeholder svg { opacity: 0.3; }
+
+/* Decorative accent on featured image */
+.about-featured-img::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--gold-lighter);
+  z-index: 0;
+  pointer-events: none;
+}
+.about-featured-img .img-frame { position: relative; z-index: 1; }
+
+/* Gallery grid: 3-6 images */
+.about-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+}
+
+.about-gallery-item {
+  overflow: hidden;
+  background: var(--pearl2);
+  position: relative;
+}
+.about-gallery-item:first-child {
+  grid-column: span 2;
+}
+.about-gallery-item .gallery-img-wrap {
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  position: relative;
+}
+.about-gallery-item:first-child .gallery-img-wrap {
+  aspect-ratio: 16/9;
+}
+.about-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+.about-gallery-item:hover img { transform: scale(1.05); }
+
+/* Placeholder when no image */
+.gallery-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 1rem;
+  text-align: center;
+}
+.gallery-placeholder svg { opacity: 0.25; }
+
+/* Caption overlay on hover */
+.gallery-caption {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(20,14,6,0.7), transparent);
+  padding: 1.2rem 1rem 0.8rem;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  pointer-events: none;
+}
+.about-gallery-item:hover .gallery-caption { transform: translateY(0); }
+.gallery-caption-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.9);
+  font-style: italic;
+}
+
+@media (max-width: 820px) {
+  .about-intro {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .about-featured-img::before { display: none; }
+}
+@media (max-width: 580px) {
+  .about-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .about-gallery-item:first-child { grid-column: span 2; }
 }
 </style>
 </head>
 
-<body>
-
 <!-- ═══════════════════════════════════════
-     NAVIGATION
+     MODAL DE RESERVA — SELECCIÓN DE ESTILISTA
+     ════════════════════════════════════════
+     INSTRUCCIONES DE EDICIÓN:
+     1. Cambia "Nombre Estilista X" por el nombre real
+     2. Cambia la especialidad en data-specialty
+     3. Reemplaza href="#setmore-estilista-X" con tu URL real de Setmore
+        Ejemplo: href="https://amanas.setmore.com/bookappointment?staff=XXXX"
+     4. Para agregar foto: reemplaza el bloque avatar-initials por:
+        <img src="foto-estilista.jpg" alt="Nombre">
+     5. Actualiza los links de WhatsApp con el número real
+═══════════════════════════════════════ -->
+<div class="booking-modal-backdrop" id="bookingModal" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
+  <div class="booking-modal">
+
+    <div class="booking-modal-header">
+      <div>
+        <h2 class="booking-modal-title" id="bookingModalTitle">¿Con quién quieres reservar?</h2>
+        <p class="booking-modal-subtitle">Elige tu estilista y reserva tu hora en línea</p>
+      </div>
+      <button class="booking-modal-close" onclick="closeBookingModal()" aria-label="Cerrar modal de reserva">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="booking-stylists-grid">
+
+      <!-- ══ ESTILISTA 1 ══
+           Editar: nombre, especialidad, foto, links -->
+      <div class="booking-stylist-card">
+        <div class="booking-stylist-photo">
+          <!-- OPCIÓN A: Mostrar iniciales (sin foto) -->
+          <span class="avatar-initials">N</span>
+          <!-- OPCIÓN B: Con foto — descomentar y editar:
+          <img src="foto-estilista-1.jpg" alt="Nombre Estilista 1">
+          -->
+        </div>
+        <h3 class="booking-stylist-name">Nombre Estilista 1</h3>
+        <p class="booking-stylist-specialty">Colorista · Especialista en Balayage</p>
+        <div class="booking-stylist-btns">
+          <!-- 🔗 SETMORE: reemplaza href con tu URL real de Setmore para esta estilista -->
+          <a href="#setmore-estilista-1" class="booking-btn-setmore" target="_blank" rel="noopener" aria-label="Reservar en línea con Estilista 1">
+            Reservar con Nombre 1
+          </a>
+          <!-- 📱 WHATSAPP: reemplaza 56XXXXXXXXX con el número real -->
+          <a href="https://wa.me/56XXXXXXXXX?text=Hola!%20Quiero%20reservar%20con%20Estilista%201%20en%20Amanas%20%F0%9F%92%87"
+             class="booking-btn-wa" target="_blank" rel="noopener" aria-label="Reservar con Estilista 1 por WhatsApp">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <!-- ══ ESTILISTA 2 ══ -->
+      <div class="booking-stylist-card">
+        <div class="booking-stylist-photo">
+          <span class="avatar-initials">N</span>
+        </div>
+        <h3 class="booking-stylist-name">Nombre Estilista 2</h3>
+        <p class="booking-stylist-specialty">Estilista · Especialista en Alisados</p>
+        <div class="booking-stylist-btns">
+          <!-- 🔗 SETMORE: reemplaza href con tu URL real de Setmore para esta estilista -->
+          <a href="#setmore-estilista-2" class="booking-btn-setmore" target="_blank" rel="noopener" aria-label="Reservar en línea con Estilista 2">
+            Reservar con Nombre 2
+          </a>
+          <a href="https://wa.me/56XXXXXXXXX?text=Hola!%20Quiero%20reservar%20con%20Estilista%202%20en%20Amanas%20%F0%9F%92%87"
+             class="booking-btn-wa" target="_blank" rel="noopener" aria-label="Reservar con Estilista 2 por WhatsApp">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <!-- ══ ESTILISTA 3 ══ -->
+      <div class="booking-stylist-card">
+        <div class="booking-stylist-photo">
+          <span class="avatar-initials">N</span>
+        </div>
+        <h3 class="booking-stylist-name">Nombre Estilista 3</h3>
+        <p class="booking-stylist-specialty">Estilista · Cortes & Colorimetría</p>
+        <div class="booking-stylist-btns">
+          <!-- 🔗 SETMORE: reemplaza href con tu URL real de Setmore para esta estilista -->
+          <a href="#setmore-estilista-3" class="booking-btn-setmore" target="_blank" rel="noopener" aria-label="Reservar en línea con Estilista 3">
+            Reservar con Nombre 3
+          </a>
+          <a href="https://wa.me/56XXXXXXXXX?text=Hola!%20Quiero%20reservar%20con%20Estilista%203%20en%20Amanas%20%F0%9F%92%87"
+             class="booking-btn-wa" target="_blank" rel="noopener" aria-label="Reservar con Estilista 3 por WhatsApp">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /booking-stylists-grid -->
+
+    <p class="booking-modal-footer">
+      ¿Primera vez en Amanas? Escríbenos por 
+      <a href="https://wa.me/56XXXXXXXXX?text=Hola!%20Es%20mi%20primera%20visita%20y%20quiero%20orientación%20antes%20de%20reservar" target="_blank" rel="noopener">WhatsApp</a> 
+      y te orientamos sin costo.<br>
+      Recuerda reservar con al menos <strong>48 horas de anticipación</strong> para servicios de colorimetría.
+    </p>
+
+  </div><!-- /booking-modal -->
+</div><!-- /booking-modal-backdrop -->
+
+
+
 ═══════════════════════════════════════ -->
 <nav id="mainNav" role="navigation" aria-label="Menú principal">
   <a href="#inicio" class="nav-logo" aria-label="Amanas - Inicio">AMANAS</a>
 
   <ul class="nav-links" id="navLinks" role="list">
     <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#nosotros">Nosotros</a></li>
     <li><a href="#largo">Guía de largo</a></li>
     <li><a href="#precios">Precios</a></li>
     <li><a href="#faq">FAQ</a></li>
     <li><a href="#ubicacion">Ubicación</a></li>
     <li><a href="#equipo">Equipo</a></li>
     <li>
-      <a href="https://wa.me/56XXXXXXXXX?text=Hola!%20Quiero%20reservar%20una%20hora%20en%20Amanas%20%F0%9F%92%87" 
-         class="nav-cta" target="_blank" rel="noopener" aria-label="Reservar hora vía WhatsApp">
+      <button onclick="openBookingModal()" class="nav-cta" aria-label="Elegir estilista y reservar hora" aria-haspopup="dialog" style="border:none;cursor:pointer;">
         Reservar
-      </a>
+      </button>
     </li>
   </ul>
 
@@ -1363,7 +1971,8 @@ section { padding: 5rem 2rem; }
 ═══════════════════════════════════════ -->
 <section class="hero" id="inicio" aria-labelledby="heroH1">
 
-  <div class="hero-eyebrow">
+  <!-- Overlay para imagen de fondo (se activa con JS si hay imagen) -->
+  <div class="hero-bg-overlay" aria-hidden="true"></div>
     <span class="eyebrow-line"></span>
     <span class="eyebrow-text">Salón de Belleza · Los Andes</span>
     <span class="eyebrow-line"></span>
@@ -1391,13 +2000,12 @@ section { padding: 5rem 2rem; }
   </div>
 
   <div class="hero-btns">
-    <a href="https://wa.me/56XXXXXXXXX?text=Hola!%20Quiero%20reservar%20una%20hora%20en%20Amanas%20%F0%9F%92%87" 
-       class="btn btn-gold" target="_blank" rel="noopener" aria-label="Reservar hora vía WhatsApp">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    <button onclick="openBookingModal()" class="btn btn-gold" aria-label="Elegir estilista y reservar hora" aria-haspopup="dialog">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
       </svg>
-      Reservar ahora
-    </a>
+      Reservar hora
+    </button>
     <a href="#servicios" class="btn btn-outline">Ver servicios</a>
   </div>
 
@@ -2052,6 +2660,167 @@ section { padding: 5rem 2rem; }
 
 
 <!-- ═══════════════════════════════════════
+     SOBRE NOSOTROS
+     ════════════════════════════════════════
+     INSTRUCCIONES DE EDICIÓN DE IMÁGENES:
+     • Imagen principal (col derecha): busca class="about-featured-img"
+       → Reemplaza el bloque "img-placeholder" con: <img src="tu-foto.jpg" alt="descripción">
+     • Galería inferior (3-6 fotos):
+       → En cada .about-gallery-item, reemplaza el bloque "gallery-placeholder" con:
+         <img src="foto-salon-X.jpg" alt="descripción">
+     • Imágenes recomendadas: interior del salón, equipo trabajando, resultados, ambiente
+═══════════════════════════════════════ -->
+<section class="about-section" id="nosotros" aria-labelledby="aboutH2">
+  <div class="about-inner">
+
+    <div class="section-header reveal" style="max-width:620px;margin:0 auto 3.5rem;text-align:center;">
+      <span class="label">Nuestra Historia</span>
+      <h2 class="section-title" id="aboutH2">Sobre <em style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold-dark)">Amanas</em></h2>
+      <div class="rule"><div class="rule-diamond"></div></div>
+    </div>
+
+    <!-- Intro: texto + imagen destacada -->
+    <div class="about-intro reveal">
+
+      <div class="about-text-col">
+        <p class="about-body">
+          En <strong style="color:var(--text);font-weight:500">Amanas</strong> creemos que el cabello es la expresión más personal de quién eres. Nuestro salón nació con la misión de llevar colorimetría de autor y técnicas premium al corazón de Los Andes.
+        </p>
+        <p class="about-body">
+          Cada visita es una experiencia pensada para ti: desde la bienvenida hasta el último secado. Trabajamos con productos de primera línea y nos mantenemos en constante formación para ofrecerte las últimas tendencias con la mejor calidad.
+        </p>
+
+        <div class="about-values" aria-label="Valores de Amanas">
+          <div class="about-value-item">
+            <span class="about-value-dot" aria-hidden="true"></span>
+            <span>Colorimetría personalizada y diagnóstico de cabello incluido</span>
+          </div>
+          <div class="about-value-item">
+            <span class="about-value-dot" aria-hidden="true"></span>
+            <span>Productos profesionales de primera línea</span>
+          </div>
+          <div class="about-value-item">
+            <span class="about-value-dot" aria-hidden="true"></span>
+            <span>Estilistas certificadas en constante formación</span>
+          </div>
+          <div class="about-value-item">
+            <span class="about-value-dot" aria-hidden="true"></span>
+            <span>Ambiente premium en el centro de Los Andes</span>
+          </div>
+        </div>
+
+        <div style="margin-top:2rem;">
+          <button onclick="openBookingModal()" class="btn btn-gold" aria-label="Reservar hora eligiendo estilista" aria-haspopup="dialog">
+            Reservar mi hora
+          </button>
+        </div>
+      </div><!-- /about-text-col -->
+
+      <!-- Imagen principal del salón -->
+      <div class="about-featured-img">
+        <div class="img-frame" aria-label="Foto principal del salón Amanas">
+          <!--
+            ╔═══════════════════════════════════╗
+            ║  REEMPLAZAR CON TU FOTO DEL SALÓN  ║
+            ║  Ejemplo:                           ║
+            ║  <img src="salon-interior.jpg"      ║
+            ║       alt="Interior Amanas Salón">  ║
+            ╚═══════════════════════════════════╝
+          -->
+          <div class="img-placeholder">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span>Foto del salón</span>
+            <span style="font-size:0.62rem;opacity:0.6">Reemplazar imagen aquí</span>
+          </div>
+        </div>
+      </div><!-- /about-featured-img -->
+
+    </div><!-- /about-intro -->
+
+    <!-- Galería de fotos: 3-6 imágenes -->
+    <div class="about-gallery reveal" role="region" aria-label="Galería de fotos del salón Amanas">
+
+      <!-- FOTO 1 (grande, ocupa 2 columnas) — ideal: ambiente general del salón -->
+      <div class="about-gallery-item">
+        <div class="gallery-img-wrap">
+          <!--
+            REEMPLAZAR: <img src="foto-salon-1.jpg" alt="Ambiente Amanas">
+          -->
+          <div class="gallery-placeholder" aria-label="Espacio para foto del salón">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span>Foto ambiente del salón</span>
+          </div>
+        </div>
+        <div class="gallery-caption" aria-hidden="true">
+          <span class="gallery-caption-text">Nuestro espacio</span>
+        </div>
+      </div>
+
+      <!-- FOTO 2 — ideal: estilista trabajando -->
+      <div class="about-gallery-item">
+        <div class="gallery-img-wrap">
+          <!--
+            REEMPLAZAR: <img src="foto-equipo-1.jpg" alt="Estilista Amanas trabajando">
+          -->
+          <div class="gallery-placeholder" aria-label="Espacio para foto del equipo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span>Foto del equipo</span>
+          </div>
+        </div>
+        <div class="gallery-caption" aria-hidden="true">
+          <span class="gallery-caption-text">Nuestras estilistas</span>
+        </div>
+      </div>
+
+      <!-- FOTO 3 — ideal: resultado de colorimetría -->
+      <div class="about-gallery-item">
+        <div class="gallery-img-wrap">
+          <!--
+            REEMPLAZAR: <img src="foto-resultado-1.jpg" alt="Resultado balayage Amanas">
+          -->
+          <div class="gallery-placeholder" aria-label="Espacio para foto de resultado">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+            </svg>
+            <span>Resultado de colorimetría</span>
+          </div>
+        </div>
+        <div class="gallery-caption" aria-hidden="true">
+          <span class="gallery-caption-text">Colorimetría de autor</span>
+        </div>
+      </div>
+
+      <!-- FOTO 4 — ideal: detalle de productos o estación de trabajo -->
+      <div class="about-gallery-item">
+        <div class="gallery-img-wrap">
+          <!--
+            REEMPLAZAR: <img src="foto-salon-2.jpg" alt="Detalle salón Amanas">
+          -->
+          <div class="gallery-placeholder" aria-label="Espacio para foto de detalle">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <span>Foto detalles del salón</span>
+          </div>
+        </div>
+        <div class="gallery-caption" aria-hidden="true">
+          <span class="gallery-caption-text">Cuidado en cada detalle</span>
+        </div>
+      </div>
+
+    </div><!-- /about-gallery -->
+
+  </div><!-- /about-inner -->
+</section>
+
+
+<!-- ═══════════════════════════════════════
      EQUIPO
 ═══════════════════════════════════════ -->
 <section class="team-section" id="equipo" aria-labelledby="equipoH2">
@@ -2122,9 +2891,9 @@ section { padding: 5rem 2rem; }
       </svg>
       Reservar por WhatsApp
     </a>
-    <a href="https://setmore.com" class="btn btn-outline" target="_blank" rel="noopener" style="color:var(--gold-light);border-color:rgba(191,160,106,0.5)" aria-label="Reservar hora en línea">
-      Reservar en línea
-    </a>
+    <button onclick="openBookingModal()" class="btn btn-outline cta-reservar-btn" style="color:var(--gold-light);border-color:rgba(191,160,106,0.5);background:transparent;cursor:pointer;" aria-label="Elegir estilista y reservar en línea" aria-haspopup="dialog">
+      Elegir estilista y reservar
+    </button>
   </div>
 </section>
 
@@ -2136,13 +2905,14 @@ section { padding: 5rem 2rem; }
   <span class="footer-logo" aria-label="Amanas Salón de Belleza">AMANAS</span>
   <p class="footer-sub">Salón de Belleza · Los Andes, Chile</p>
   <nav class="footer-links" aria-label="Navegación de pie de página">
+    <a href="#nosotros">Sobre Nosotros</a>
     <a href="#servicios">Servicios</a>
     <a href="#largo">Guía de largo</a>
     <a href="#precios">Precios</a>
     <a href="#faq">FAQ</a>
     <a href="#ubicacion">Ubicación</a>
     <a href="#equipo">Equipo</a>
-    <a href="https://setmore.com" target="_blank" rel="noopener">Reservar hora</a>
+    <a href="#" onclick="openBookingModal();return false;" aria-haspopup="dialog">Reservar hora</a>
     <a href="https://instagram.com/amanas.salon" target="_blank" rel="noopener">Instagram</a>
   </nav>
   <div class="footer-rule" aria-hidden="true"></div>
@@ -2182,11 +2952,55 @@ function toggleMenu() {
 }
 
 /* Close menu on link click */
-document.querySelectorAll('.nav-links a').forEach(link => {
+document.querySelectorAll('.nav-links a, .nav-links button').forEach(link => {
   link.addEventListener('click', () => {
     document.getElementById('navLinks').classList.remove('open');
     document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'false');
   });
+});
+
+/* ── HERO BG IMAGE DETECTION ──
+   Si se configura una imagen de fondo en :root --hero-bg-image,
+   activa automáticamente el overlay oscuro y los estilos de texto blanco.
+*/
+(function() {
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+  const heroBg = getComputedStyle(document.documentElement)
+    .getPropertyValue('--hero-bg-image').trim();
+  if (heroBg && heroBg !== 'none' && heroBg !== '') {
+    hero.classList.add('has-bg-image');
+  }
+})();
+
+/* ── BOOKING MODAL ── */
+const bookingModal = document.getElementById('bookingModal');
+
+function openBookingModal() {
+  bookingModal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Focus the close button for accessibility
+  setTimeout(() => {
+    const closeBtn = bookingModal.querySelector('.booking-modal-close');
+    if (closeBtn) closeBtn.focus();
+  }, 100);
+}
+
+function closeBookingModal() {
+  bookingModal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* Close on backdrop click */
+bookingModal.addEventListener('click', function(e) {
+  if (e.target === bookingModal) closeBookingModal();
+});
+
+/* Close on Escape key */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && bookingModal.classList.contains('open')) {
+    closeBookingModal();
+  }
 });
 
 /* ── SCROLL REVEAL ── */
@@ -2222,8 +3036,10 @@ function toggleFaq(btn) {
 /* ── SMOOTH INTERNAL LINKS ── */
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function(e) {
+    const href = this.getAttribute('href');
+    if (href === '#') return; // skip modal-trigger anchors
     e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
+    const target = document.querySelector(href);
     if (target) {
       const offset = 80;
       const top = target.getBoundingClientRect().top + window.scrollY - offset;
