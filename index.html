@@ -710,7 +710,191 @@
     section { padding: 4rem 1rem; }
     .team-photo-wrap { height: 220px; }
   }
+
+  /* ── PROMOCIÓN DEL MES ── */
+  .promocion-section {
+    background: linear-gradient(135deg, var(--cream) 0%, var(--pearl) 50%, var(--pearl2) 100%);
+    padding: 5rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .promocion-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(201,168,76,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .promocion-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+  .promocion-content {
+    text-align: center;
+  }
+  .promocion-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 300;
+    color: var(--gold-dark);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+  .promocion-subtitle {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+  .promocion-descuento {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(4rem, 10vw, 7rem);
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 10px rgba(201,168,76,0.3);
+  }
+  .promocion-accent {
+    color: #C31D23;
+    font-weight: 600;
+  }
+  .promocion-cobrizo {
+    color: #e96f0b;
+    font-weight: 600;
+  }
+  .promocion-rojo {
+    color: #C31D23;
+    font-weight: 600;
+  }
+  .promocion-violeta {
+    color: #c5179f;
+    font-weight: 600;
+  }
+  .promocion-previa {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .promocion-contacto {
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+  .promocion-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    line-height: 1.4;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .promocion-validity {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 2.5rem;
+  }
+  .btn-reservar-promocion {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--white);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 1.2rem 2.5rem;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(201,168,76,0.3);
+  }
+  .btn-reservar-promocion:hover {
+    background: var(--gold-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(201,168,76,0.4);
+  }
+  .promocion-galeria {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .promocion-img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 25px;
+    border: 2px solid rgba(201,168,76,0.2);
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    cursor: pointer;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+    display: block;
+    min-height: 380px;
+  }
+  .promocion-img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 14px 40px rgba(201,168,76,0.25);
+    border-color: var(--gold);
+  }
+  .promocion-placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    background: linear-gradient(135deg, var(--pearl) 0%, var(--pearl2) 100%);
+    border: 2px solid rgba(201,168,76,0.2);
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: var(--gold-light);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+  }
+  .promocion-placeholder svg {
+    width: 36px;
+    height: 36px;
+    opacity: 0.6;
+  }
+  @media(max-width: 900px) {
+    .promocion-container {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+    .promocion-content {
+      order: 2;
+    }
+    .promocion-galeria {
+      order: 1;
+    }
+  }
+  @media(max-width: 640px) {
+    .promocion-galeria {
+      max-width: 100%;
+    }
+    .promocion-img,
+    .promocion-placeholder {
+      min-width: 100%;
+      aspect-ratio: 4 / 5;
+    }
+  }
 </style>
+<link rel="icon" href="iconamanas.jpeg" type="image/png">
 </head>
 <body>
 
@@ -737,7 +921,7 @@
       </a>
       <div class="modal-divider">o</div>
       <!-- ESTILISTA 2 ▸ cambia href, nombre, rol e inicial (B) -->
-      <a href="https://yuniorjose.setmore.com/lenin-monsalve" class="modal-stylist-btn" target="_blank" onclick="closeModal()">
+      <a href="https://salonamanas.setmore.com/lenin-monsalve" class="modal-stylist-btn" target="_blank" onclick="closeModal()">
         <img src="l2.jpeg" alt="Lenin Monsalve" class="modal-stylist-photo"
           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
         <div class="modal-stylist-avatar" style="display:none;">B</div>
@@ -767,6 +951,7 @@
     <li><a href="#servicios">Servicios</a></li>
     <li><a href="#equipo">Equipo</a></li>
     <li><a href="#faq">FAQ</a></li>
+    <li><a href="#promocion">Promoción</a></li>
     <li><a href="https://salonamanas.setmore.com/" target="_blank" class="nav-cta">Reservar</a></li>
   </ul>
   <div class="hamburger" id="hamburger" onclick="toggleMenu()">
@@ -803,6 +988,39 @@
         <circle cx="12" cy="13" r="3"/>
       </svg>
      
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     PROMOCIÓN DEL MES
+════════════════════════════════════════ -->
+<section class="promocion-section reveal" id="promocion">
+  <div class="promocion-container">
+    <div class="promocion-content">
+      <h2 class="promocion-title">PROMOCIÓN DEL MES</h2>
+      <p class="promocion-subtitle">Todos los colores <span class="promocion-cobrizo">cobrizos</span>, <span class="promocion-rojo">rojos</span> y <span class="promocion-violeta">violetas</span></p>
+      <div class="promocion-descuento"><span class="promocion-accent">20%</span> DE DESCUENTO</div>
+      <p class="promocion-previa">Previa cita</p>
+      <p class="promocion-contacto">Contáctanos: +56 9 7542 8530</p>
+      <p class="promocion-quote">"Invierte en tu cabello, es la corona que nunca te quitas"</p>
+      <p class="promocion-validity">Promoción válida desde el 20 de abril al 20 de mayo 2026</p>
+      <a href="https://wa.me/56975428530?text=Hola,%20me%20gustaría%20reservar%20una%20cita%20para%20la%20promoción%20del%20mes" 
+         target="_blank" 
+         rel="noopener noreferrer" 
+         class="btn-reservar-promocion">
+        Reservar ahora
+      </a>
+    </div>
+    <div class="promocion-galeria">
+      <img src="tintesrojos.png" alt="Colección de cortes cobrizos, rojos y violetas" class="promocion-img"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="promocion-placeholder" style="display:none;">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+        </svg>
+        <span>Reemplaza esta imagen con tu URL o archivo local</span>
+      </div>
     </div>
   </div>
 </section>
@@ -1495,6 +1713,7 @@
     <a href="#secado">Secado</a>
     <a href="#equipo">Equipo</a>
     <a href="#faq">FAQ</a>
+    <a href="#promocion">Promoción</a>
     <a href="https://setmore.com" target="_blank">Reservar hora</a>
     <a href="https://www.instagram.com/salonamanas/?hl=es-la" target="_blank">Instagram</a>
   </div>
