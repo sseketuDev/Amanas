@@ -282,6 +282,22 @@
     display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
     opacity: 0; animation: fadeUp 1s 0.95s forwards;
   }
+  .hero-team-grid {
+    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    margin-top: 1.6rem;
+  }
+  .hero-team-card {
+    background: rgba(255,255,255,0.95); border: 1px solid #e8e0d0;
+    overflow: hidden; text-align: center; flex: 1; min-width: 240px; max-width: 320px;
+    box-shadow: 0 14px 40px rgba(201,168,76,0.1);
+  }
+  .hero-team-card .team-photo-wrap { height: 280px; }
+  .hero-team-card .team-body { padding: 1.5rem; }
+  .hero-team-card .team-name { font-size: 1.3rem; margin-bottom: 0.25rem; }
+  .hero-team-card .team-bio { font-size: 0.85rem; margin-bottom: 1.25rem; }
+  .hero-team-card .team-btns { display: flex; justify-content: center; }
+  .hero-team-card .btn-reservar-team { padding: 0.85rem 1.1rem; font-size: 0.78rem; }
+  .btn-mini { padding: 0.8rem 1.6rem; font-size: 0.7rem; }
 
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(24px); }
@@ -389,6 +405,55 @@
     .about-text .section-header { text-align: center; }
     .about-text .divider { margin: 1.25rem auto; }
     .about-values { justify-content: center; }
+  }
+
+  /* ── MARCAS ── */
+  .brands-section {
+    background: #b71c1c;
+    color: #fff;
+    padding: 5rem 1.5rem;
+    overflow: hidden;
+  }
+  .brands-section .section-title { color: #fff; }
+  .brands-section .section-label { color: rgba(255,255,255,0.8); }
+  .brands-section .divider::before, .brands-section .divider::after { background: rgba(255,255,255,0.35); }
+  .brands-section .divider-dot { background: #fff; }
+  .brands-section p { color: rgba(255,255,255,0.8); }
+  .brands-carousel { overflow: hidden; padding: 1.5rem 0; }
+  .brands-track {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    width: max-content;
+    animation: brandsScroll 16s linear infinite;
+    will-change: transform;
+  }
+  .brands-set {
+    display: flex;
+    gap: 2rem;
+  }
+  .brand-item {
+    flex: none;
+    width: 240px;
+    min-width: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem 1.5rem;
+    background: rgba(255,255,255,0.08);
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+  }
+  .brand-item img {
+    max-width: 170px;
+    max-height: 90px;
+    object-fit: contain;
+    filter: brightness(1.05);
+  }
+  @keyframes brandsScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
   }
 
   /* ── TUTORIAL MEDICIÓN ── */
@@ -590,20 +655,23 @@
     justify-content: center; max-width: 900px; margin: 0 auto;
   }
   .team-card {
-    background: var(--white); border: 1px solid #e8e0d0;
-    transition: box-shadow 0.3s; overflow: hidden; text-align: center;
+    background: rgba(253,251,247,0.95); border: 1px solid rgba(201,168,76,0.18);
+    transition: box-shadow 0.3s, transform 0.3s; overflow: hidden; text-align: center;
     flex: 1; min-width: 280px; max-width: 380px;
+    box-shadow: 0 18px 45px rgba(201,168,76,0.08);
   }
-  .team-card:hover { box-shadow: 0 10px 40px rgba(201,168,76,0.12); }
+  .team-card:hover { box-shadow: 0 18px 55px rgba(201,168,76,0.16); transform: translateY(-3px); }
   .team-photo-wrap {
     position: relative; width: 100%; height: 280px;
-    overflow: hidden; background: var(--pearl2);
+    overflow: hidden; background: linear-gradient(180deg, rgba(201,168,76,0.08), rgba(253,251,247,0.95));
   }
   .team-photo {
     width: 100%; height: 100%; object-fit: cover; object-position: center top;
     display: block; transition: transform 0.5s ease;
   }
+  .team-photo.rotate-180 { transform: rotate(270deg); }
   .team-card:hover .team-photo { transform: scale(1.04); }
+  .team-card:hover .team-photo.rotate-180 { transform: rotate(270deg) scale(1.04); }
   .team-avatar-fallback {
     width: 100%; height: 100%; display: none; align-items: center; justify-content: center;
     font-family: 'Cormorant Garamond', serif; font-size: 4rem; font-weight: 300;
@@ -613,6 +681,10 @@
   .team-name {
     font-family: 'Cormorant Garamond', serif; font-size: 1.5rem;
     font-weight: 400; margin-bottom: 0.25rem; color: var(--text);
+  }
+  .team-history {
+    font-size: 0.78rem; color: var(--text-muted); line-height: 1.65;
+    margin-bottom: 1.1rem;
   }
   .team-role {
     font-size: 0.65rem; color: var(--gold); letter-spacing: 0.2em;
@@ -946,19 +1018,51 @@
       <span class="hero-ornament-icon">✦ Salon de Belleza ✦</span>
       <div class="hero-ornament-line"></div>
     </div>
-    <h1 class="salon-name">Amanas</h1>
-    <p class="salon-subtitle">Peluquería y salón de belleza en Los Andes</p>
+    <h1 class="salon-name" id="heroHeading">Amanas Salón de Belleza en Los Andes</h1>
+    <p class="salon-subtitle">Peluquería profesional especializada en alisados, mechas y colorimetría</p>
     <p class="salon-location">📍 O'Higgins 400, Galería Cordillera uno, local 2 · Los Andes</p>
-    <p class="hero-text" style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">Alisados, mechas, tintes, balayage y cortes con productos premium Wella, Davines y Elgon. Reserva tu hora por WhatsApp o Setmore.</p>
+    <h2 class="hero-service-title">Alisados, mechas balayage, tintes personalizados y cortes de temporada</h2>
+    <p class="hero-text" style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">Atendemos con productos premium Wella, Davines y Elgon para lograr resultados duraderos y cuidar tu cabello. Reserva tu hora con nuestros estilistas expertos en Los Andes.</p>
     <div class="gold-divider"><span class="gold-divider-icon">👑</span></div>
     <p class="hero-quote">Invierte en tu cabello, es la corona que nunca te quitas.</p>
+    <div class="hero-team-grid">
+      <article class="hero-team-card">
+        <div class="team-photo-wrap">
+          <img src="yunior3.jpeg" alt="Yunior Amanas, estilista colorista en Amanas Los Andes" class="team-photo"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="team-avatar-fallback" style="display:none;">Y</div>
+        </div>
+        <div class="team-body">
+          <h3 class="team-name">Yunior Amanas</h3>
+          <p class="team-role">Estilista · Colorista</p>
+          <p class="team-bio">Especialista en colorimetría y mechas con resultados personalizados y cuidado premium.</p>
+          <div class="team-btns">
+            <a href="https://salonamanas.setmore.com/yuniorjose" class="btn-reservar-team" target="_blank">Reservar</a>
+          </div>
+        </div>
+      </article>
+      <article class="hero-team-card">
+        <div class="team-photo-wrap">
+          <img src="L.jpeg" alt="Lenin Monsalve, estilista especialista en alisados en Amanas" class="team-photo"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="team-avatar-fallback" style="display:none;">L</div>
+        </div>
+        <div class="team-body">
+          <h3 class="team-name">Lenin Monsalve</h3>
+          <p class="team-role">Estilista</p>
+          <p class="team-bio">Apasionado por alisados y tratamientos que transforman la textura y brillo del cabello.</p>
+          <div class="team-btns">
+            <a href="https://salonamanas.setmore.com/lenin-monsalve" class="btn-reservar-team" target="_blank">Reservar</a>
+          </div>
+        </div>
+      </article>
+    </div>
     <div class="hero-btns">
-      <a href="https://salonamanas.setmore.com" target="_blank" class="btn-primary">Reservar hora</a>
-      <a href="#servicios" class="btn-secondary">Ver Precios</a>
+      <a href="#servicios" class="btn-secondary btn-mini">Ver servicios de peluquería</a>
     </div>
   </div>
   <div class="hero-image-panel" id="heroPanel">
-    <img src="hero4.png" alt="Amanas Salon de Belleza Los Andes" class="hero-img"
+    <img src="hero4.png" alt="Interior de Amanas Salón de Belleza en Los Andes" class="hero-img"
       onerror="document.getElementById('heroPanel').classList.add('no-image'); this.style.display='none'; document.getElementById('heroPlaceholder').style.display='flex';">
     <div class="hero-img-placeholder" id="heroPlaceholder" style="display:none;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
@@ -1015,7 +1119,7 @@
     <div class="about-text reveal">
       <div class="section-header">
         <span class="section-label" style="color:rgba(201,168,76,0.7);">Quiénes somos</span>
-        <h2 class="section-title" style="color:var(--gold-light);">Sobre nosotros</h2>
+        <h2 class="section-title" style="color:var(--gold-light);">Sobre nosotros y nuestro equipo</h2>
         <div class="divider" style="margin:1.25rem 0;"><div class="divider-dot" style="background:var(--gold);"></div></div>
       </div>
       <p class="about-lead">
@@ -1042,6 +1146,114 @@
           <span class="about-value-icon">💛</span>
           <span class="about-value-label">Cuidado</span>
           <span class="about-value-desc">Trato personal</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="team-intro reveal">
+    <span class="section-label" style="color:rgba(201,168,76,0.7);">Nuestro Equipo</span>
+    <h3 class="section-title" style="color:var(--gold-light); font-size: clamp(1.8rem, 3vw, 2.5rem); margin-top: 2.5rem;">Conoce a quienes crean tus cambios de look</h3>
+    <p style="font-size:0.9rem;color:var(--text-muted);margin-top:0.75rem;max-width:720px;">
+      Nuestro equipo está formado por estilistas con experiencia en colorimetría, alisados y tratamientos de alto cuidado. Cada historia suma técnica, pasión y compromiso con tu cabello.
+    </p>
+  </div>
+  <div class="team-grid reveal" id="equipo">
+
+    <div class="team-card">
+      <div class="team-photo-wrap">
+        <img src="Yuniorfoto.jpeg" alt="Yunior Piña - Especialista en colorimetría en Los Andes" class="team-photo rotate-180"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="team-avatar-fallback" style="display:none;">Y</div>
+      </div>
+      <div class="team-body">
+        <h3 class="team-name">Yunior Amanas</h3>
+        <p class="team-role">Estilista · Colorista</p>
+        <p class="team-bio">Con más de 22 años de experiencia en el mundo de la belleza, Yunior Amanas inició su trayectoria en Venezuela, donde abrió su primer salón a los 25 años.
+
+A los 31 años llegó a Chile, trabajando durante años en el salón Estilo Venezolano, perfeccionando su técnica y estilo profesional.
+
+Después de la pandemia decidió independizarse y el 21 de julio inauguró Salón Amanas, un espacio creado para entregar belleza, confianza y atención de calidad a cada cliente.
+
+Especialista en cortes, balayage, colorimetría y maquillaje profesional. ✨</p>
+        <p class="team-history">Su historia como estilista nació por la pasión por el cabello saludable y el deseo de crear looks únicos que realcen la personalidad de cada cliente.</p>
+        <div class="team-btns">
+          <a href="https://wa.me/56975428530?text=Hola!%20Quiero%20reservar%20con%20Yunior%20Piña%20en%20Amanas%20%F0%9F%92%87%E2%80%8D%E2%99%80%EF%B8%8F" class="btn-wsp" target="_blank">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp
+          </a>
+          <a href="https://salonamanas.setmore.com/yuniorjose" class="btn-reservar-team" target="_blank">Reservar</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="team-card">
+      <div class="team-photo-wrap">
+        <img src="Lenin.jpeg" alt="Lenin Monsalve - Especialista en alisados en Los Andes" class="team-photo rotate-180"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="team-avatar-fallback" style="display:none;">L</div>
+      </div>
+      <div class="team-body">
+        <h3 class="team-name">Lenin Monsalve Nelo</h3>
+        <p class="team-role">Estilista</p>
+        <p class="team-bio">Con más de 11 años de experiencia en el mundo de la belleza, Lenin Monsalve inició su carrera como técnico capilar y, gracias a su talento y dedicación, al poco tiempo se convirtió en estilista profesional.
+
+En 2017 llegó a Chile, formando parte del salón Glamour Venezolano, donde trabajó durante 3 años perfeccionando su técnica y atención al cliente.
+
+Tras la pandemia comenzó a trabajar de manera independiente y, desde octubre de 2025, forma parte de Salón Amanas, aportando experiencia, estilo y profesionalismo en cada servicio.
+
+Especialista en mechas, cortes, alisados e hidrataciones capilares. ✨</p>
+        <p class="team-history">Su camino como estilista viene de una formación técnica y la convicción de que un cabello sano es la base de cualquier look espectacular.</p>
+        <div class="team-btns">
+          <a href="https://wa.me/56975428530?text=Hola!%20Quiero%20reservar%20con%20Lenin%20Monsalve%20en%20Amanas%20%F0%9F%92%87%E2%80%8D%E2%99%80%EF%B8%8F" class="btn-wsp" target="_blank">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp
+          </a>
+          <a href="https://salonamanas.setmore.com/lenin-monsalve" class="btn-reservar-team" target="_blank">Reservar</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="brands-section reveal" id="marcas">
+  <div class="section-header">
+    <span class="section-label">Nuestras marcas</span>
+    <h2 class="section-title">Marcas profesionales que usamos</h2>
+    <div class="divider"><div class="divider-dot"></div></div>
+    <p style="font-size:0.95rem; max-width:720px; margin:0 auto;">
+      En Amanas trabajamos con Wella, Elgon y Salerm para ofrecer tratamientos de color, alisados y cuidados con resultados duraderos.
+    </p>
+  </div>
+  <div class="brands-carousel">
+    <div class="brands-track">
+      <div class="brands-set">
+        <div class="brand-item">
+          <img src="https://logos-world.net/wp-content/uploads/2020/11/Wella-Logo.png" alt="Logo Wella" loading="lazy">
+        </div>
+        <div class="brand-item">
+          <img src="https://www.hairmarket.it/pimages/Elgon-image-6-892.jpg" alt="Logo Elgon" loading="lazy">
+        </div>
+        <div class="brand-item">
+          <img src="https://www.vhv.rs/dpng/d/615-6158109_salerm-logo-salerm-cosmetics-hd-png-download.png" alt="Logo Salerm" loading="lazy">
+        </div>
+        <div class="brand-item">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsjL34DXHrnwZ3lcPrb5nub_L4WYSg_4R5OQ&s" alt="Logo Davines" loading="lazy">
+        </div>
+      </div>
+      <div class="brands-set">
+        <div class="brand-item">
+          <img src="https://logos-world.net/wp-content/uploads/2020/11/Wella-Logo.png" alt="Logo Wella" loading="lazy">
+        </div>
+        <div class="brand-item">
+          <img src="https://www.hairmarket.it/pimages/Elgon-image-6-892.jpg" alt="Logo Elgon" loading="lazy">
+        </div>
+        <div class="brand-item">
+          <img src="https://www.vhv.rs/dpng/d/615-6158109_salerm-logo-salerm-cosmetics-hd-png-download.png" alt="Logo Salerm" loading="lazy">
+        </div>
+        <div class="brand-item">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsjL34DXHrnwZ3lcPrb5nub_L4WYSg_4R5OQ&s" alt="Logo Davines" loading="lazy">
         </div>
       </div>
     </div>
@@ -1504,63 +1716,6 @@
         </tbody>
       </table>
       <button class="btn-reservar" onclick="openModal(this)">Reservar hora</button>
-    </div>
-
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════
-     7. NUESTRO EQUIPO
-════════════════════════════════════════ -->
-<section class="team-section" id="equipo">
-  <div class="section-header reveal">
-    <span class="section-label">Tu Estilista</span>
-    <h2 class="section-title">Nuestro Equipo</h2>
-    <div class="divider"><div class="divider-dot"></div></div>
-    <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.5rem;">Elige con quién quieres trabajar y reserva directamente. Especialistas en alisados, mechas y colorimetría.</p>
-  </div>
-  <div class="team-grid reveal">
-
-    <!-- ESTILISTA 1 ▸ cambia nombre, inicial (Y), foto, WhatsApp y link Setmore -->
-    <div class="team-card">
-      <div class="team-photo-wrap">
-        <img src="yunior3.jpeg" alt="Yunior Piña - Especialista en colorimetría en Los Andes" class="team-photo"
-          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        <div class="team-avatar-fallback" style="display:none;">Y</div>
-      </div>
-      <div class="team-body">
-        <h3 class="team-name">Yunior Amanas</h3>
-        <p class="team-role">Estilista · Colorista</p>
-        <p class="team-bio">Especialista en colorimetría y técnicas de mechas. Transforma el cabello con precisión y pasión, logrando looks únicos y personalizados.</p>
-        <div class="team-btns">
-          <a href="https://wa.me/56975428530?text=Hola!%20Quiero%20reservar%20con%20Yunior%20Piña%20en%20Amanas%20%F0%9F%92%87%E2%80%8D%E2%99%80%EF%B8%8F" class="btn-wsp" target="_blank">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            WhatsApp
-          </a>
-          <a href="https://salonamanas.setmore.com/yuniorjose" class="btn-reservar-team" target="_blank">Reservar con Setmore</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- ESTILISTA 2 ▸ cambia nombre, inicial (L), foto, WhatsApp y link Setmore -->
-    <div class="team-card">
-      <div class="team-photo-wrap">
-        <img src="L.jpeg" alt="Lenin Monsalve - Especialista en alisados en Los Andes" class="team-photo"
-          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        <div class="team-avatar-fallback" style="display:none;">L</div>
-      </div>
-      <div class="team-body">
-        <h3 class="team-name">Lenin Monsalve Nelo</h3>
-        <p class="team-role"> Estilista </p>
-        <p class="team-bio">Especialista en mehcas tradicionales,apasionados por los alisados y las hidrataciones</p>
-        <div class="team-btns">
-          <a href="https://wa.me/56975428530?text=Hola!%20Quiero%20reservar%20con%20Lenin%20Monsalve%20en%20Amanas%20%F0%9F%92%87%E2%80%8D%E2%99%80%EF%B8%8F" class="btn-wsp" target="_blank">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            WhatsApp
-          </a>
-          <a href="https://salonamanas.setmore.com/lenin-monsalve" class="btn-reservar-team" target="_blank">Reservar con Setmore</a>
-        </div>
-      </div>
     </div>
 
   </div>
